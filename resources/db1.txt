@@ -1,0 +1,3 @@
+rozdzial1 10
+rozdzial2 20
+rozdzial3 30
