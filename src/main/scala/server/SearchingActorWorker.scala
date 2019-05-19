@@ -26,6 +26,6 @@ class SearchingActorWorker(dbIndex: Int) extends Actor {
         case None => sender ! NotFound(title)
       }
 
-    case v => logger.info("Searching worker received: " + v)
+    case s => throw WrongRequest(s"Message of type ${s.getClass.getName} not acceptable")
   }
 }

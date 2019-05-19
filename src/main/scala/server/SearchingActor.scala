@@ -1,6 +1,7 @@
 package server
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.SupervisorStrategy.Restart
+import akka.actor.{Actor, ActorRef, OneForOneStrategy, Props, SupervisorStrategy}
 import akka.event.Logging
 import akka.pattern.ask
 import akka.stream.ActorMaterializer
@@ -9,6 +10,7 @@ import messages.{Found, NotFound}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 class SearchingActor extends Actor {
   val logger = Logging(context.system, this)
@@ -39,7 +41,16 @@ class SearchingActor extends Actor {
         case None => sender
       }
 
-      extracted.onComplete(s => destination ! s.get)
-    case _ => logger.info("Not implemented in searching actor")
+      extracted.onComplete{
+        case Failure(exception) => destination ! NotFound("Exception: " + exception)
+        case Success(v) => destination ! v
+      }
+    case s => throw WrongRequest(s"Message of type ${s.getClass.getName} not acceptable")
+  }
+
+  override def supervisorStrategy: SupervisorStrategy = {
+    OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
+      case _: Exception => Restart
+    }
   }
 }

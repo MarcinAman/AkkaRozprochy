@@ -50,6 +50,6 @@ class OrderActor extends Actor {
 
       }.onComplete(s => ref ! s.getOrElse(Denial(value.title, "Internal error")))
 
-    case s => logger.info(s.getClass.getName + " not implemented in order actor")
+    case s => throw WrongRequest(s"Message of type ${s.getClass.getName} not acceptable")
   }
 }

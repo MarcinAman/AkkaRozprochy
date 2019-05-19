@@ -32,6 +32,6 @@ class StreamingActorWorker extends Actor {
         .to(Sink.actorRef(client, "END"))
         .run()
 
-    case _ => throw WrongRequest("Message not acceptable")
+    case s => throw WrongRequest(s"Message of type ${s.getClass.getName} not acceptable")
   }
 }
