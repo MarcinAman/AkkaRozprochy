@@ -7,7 +7,7 @@ case class StreamRequestRef(value: StreamRequest, orderActor: ActorRef, ref: Act
 
 case class OrderRequestRef(value: OrderRequest, searchingActor: ActorRef, ref: ActorRef)
 
-case class SearchRequestRef(value: SearchRequest, ref: ActorRef)
+case class SearchRequestRef(value: SearchRequest, ref: Option[ActorRef])
 
 
 

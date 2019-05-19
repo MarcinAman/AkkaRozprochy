@@ -14,7 +14,7 @@ class ServerActor extends Actor {
   override def receive: Receive = {
     case order: OrderRequest => orderActor ! OrderRequestRef(order, searchingActor, context.sender())
     case stream: StreamRequest => streamingActor ! StreamRequestRef(stream, orderActor, context.sender())
-    case search: SearchRequest => searchingActor ! SearchRequestRef(search, context.sender())
+    case search: SearchRequest => searchingActor ! SearchRequestRef(search, Some(context.sender()))
     case _ => context.sender() ! RequestNotFound
   }
 }

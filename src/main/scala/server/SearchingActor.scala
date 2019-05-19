@@ -34,7 +34,12 @@ class SearchingActor extends Actor {
         case _ => NotFound(value.title)
       }
 
-      extracted.onComplete(s => ref ! s.get)
+      val destination = ref match {
+        case Some(v) => v
+        case None => sender
+      }
+
+      extracted.onComplete(s => destination ! s.get)
     case _ => logger.info("Not implemented in searching actor")
   }
 }
