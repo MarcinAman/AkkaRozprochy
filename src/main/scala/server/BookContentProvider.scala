@@ -9,6 +9,6 @@ class BookContentProvider {
 
     val lines = f.getLines().toList
     f.close()
-    lines.filter(s => !s.isBlank).iterator
+    lines.filter(s => !s.isEmpty).iterator
   }
 }
