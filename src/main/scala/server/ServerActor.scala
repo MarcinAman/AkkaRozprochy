@@ -18,9 +18,9 @@ class ServerActor extends Actor {
   val searchingActor: ActorRef = context.actorOf(Props[SearchingActor], "searching_actor")
 
   override def receive: Receive = {
-    case order: OrderRequest => orderActor ! OrderRequestRef(order, searchingActor, context.sender())
-    case stream: StreamRequest => streamingActor ! StreamRequestRef(stream, orderActor, context.sender())
-    case search: SearchRequest => searchingActor ! SearchRequestRef(search, Some(context.sender()))
+    case order: OrderRequest => orderActor forward order
+    case stream: StreamRequest => streamingActor forward stream
+    case search: SearchRequest => searchingActor forward search
     case _ => context.sender() ! RequestNotFound
   }
 

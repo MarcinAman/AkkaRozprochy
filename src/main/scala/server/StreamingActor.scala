@@ -4,6 +4,8 @@ import akka.actor.SupervisorStrategy.Restart
 import akka.actor.{Actor, OneForOneStrategy, Props, SupervisorStrategy}
 import akka.event.Logging
 import akka.stream.ActorMaterializer
+import messages.StreamRequest
+
 import scala.concurrent.duration._
 
 
@@ -13,10 +15,10 @@ class StreamingActor extends Actor {
   implicit val mat: ActorMaterializer = ActorMaterializer()
 
   override def receive: Receive = {
-    case StreamRequestRef(v, orderActor, client) =>
-      logger.info("Streaming actor received request for: " + v.title)
+    case streamRequest: StreamRequest =>
+      logger.info("Streaming actor received request for: " + streamRequest.title)
 
-      context.actorOf(Props[StreamingActorWorker]) ! StreamRequestRef(v, orderActor, client)
+      context.actorOf(Props[StreamingActorWorker]).forward(streamRequest)
     case s => throw WrongRequest(s"Message of type ${s.getClass.getName} not acceptable")
   }
 

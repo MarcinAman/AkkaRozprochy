@@ -1,0 +1,1 @@
+Zadanie wykonałem samodzielnie - Marcin Aman

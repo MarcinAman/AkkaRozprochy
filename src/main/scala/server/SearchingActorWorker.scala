@@ -15,6 +15,8 @@ class SearchingActorWorker(dbIndex: Int) extends Actor {
 
   override def receive: Receive = {
     case SearchRequest(title) =>
+      logger.info(s"Searching worker received message to search: $title")
+
       val f = new File(dbPath)
       val src = Source.fromFile(f)
       val lines = src.getLines().toList

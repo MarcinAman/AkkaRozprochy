@@ -6,7 +6,7 @@ import akka.event.Logging
 import akka.pattern.ask
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import messages.{Found, NotFound}
+import messages.{Found, NotFound, SearchRequest}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -23,27 +23,23 @@ class SearchingActor extends Actor {
   val worker2: ActorRef = context.actorOf(Props(new SearchingActorWorker(2)), "searching_worker_2")
 
   override def receive: Receive = {
-    case SearchRequestRef(value, ref) =>
+    case searchRequest: SearchRequest =>
+      logger.info(s"Searching actor received message: $searchRequest")
 
       val response = for {
-        r1 <- ask(worker1, value)
-        r2 <- ask(worker2, value)
+        r1 <- ask(worker1, searchRequest)
+        r2 <- ask(worker2, searchRequest)
       } yield (r1, r2)
 
       val extracted = response.map {
         case (Found(title,price), _) => Found(title, price)
         case (_, Found(title, price)) => Found(title, price)
-        case _ => NotFound(value.title)
-      }
-
-      val destination = ref match {
-        case Some(v) => v
-        case None => sender
+        case _ => NotFound(searchRequest.title)
       }
 
       extracted.onComplete{
-        case Failure(exception) => destination ! NotFound("Exception: " + exception)
-        case Success(v) => destination ! v
+        case Failure(exception) => sender ! NotFound("Exception: " + exception)
+        case Success(v) => sender ! v
       }
     case s => throw WrongRequest(s"Message of type ${s.getClass.getName} not acceptable")
   }
